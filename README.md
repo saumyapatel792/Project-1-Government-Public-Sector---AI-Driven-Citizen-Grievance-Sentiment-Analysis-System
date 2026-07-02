@@ -17,7 +17,7 @@ The platform contains two distinct workspaces:
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```mermaid
 graph TD
@@ -36,7 +36,7 @@ graph TD
 
 ---
 
-## 🎯 Core Features
+## Core Features
 1.  **Multi-Class Department Routing:** Maps complex unstructured text into one of 18 official government departments (e.g., MINWR, DOURD, DOSAT) automatically.
 2.  **Sentiment Triage Heuristics:** Computes an Urgency Priority Index (UPI) from 0.0 to 10.0 using model confidence score, sentiment class, and length parameters.
 3.  **End-to-End Authentication:** Secure SQLite-backed user signup and token-session management.
@@ -45,7 +45,7 @@ graph TD
 
 ---
 
-## 📊 Machine Learning Model Performance
+## Machine Learning Model Performance
 
 ### Department Routing Classifier
 *   **Model Type:** TF-IDF Vectorizer + Multi-class Logistic Regression
@@ -61,7 +61,7 @@ graph TD
 
 ---
 
-## ⚙️ Tech Stack & Requirements
+## Tech Stack & Requirements
 *   **Backend:** Python 3.8+, FastAPI, Uvicorn, SQLite
 *   **Machine Learning:** Scikit-learn, joblib, NumPy, Pandas, NLTK
 *   **Frontend:** Vanilla CSS, HTML5, JavaScript (SPA architecture), Chart.js CDN, FontAwesome CDN
@@ -69,7 +69,7 @@ graph TD
 
 ---
 
-## 🚀 Installation & Setup
+##  Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -94,7 +94,7 @@ Navigate to **`http://127.0.0.1:8000/`** in your browser.
 
 ---
 
-## 🔐 Seeding & Demo Access Credentials
+## Seeding & Demo Access Credentials
 For demo presentation purposes, the database is pre-seeded with sample grievances and accounts:
 *   **Citizen Account:**
     *   **Username:** `citizen`
