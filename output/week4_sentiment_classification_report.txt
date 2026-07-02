@@ -1,0 +1,17 @@
+SENTIMENT CLASSIFICATION REPORT (Week 4)
+======================================================================
+
+Overall Accuracy: 0.9294
+Macro F1-Score: 0.5706 (Emphasizes Minority Classes)
+Weighted F1-Score: 0.9176
+
+                 precision    recall  f1-score   support
+
+       Positive       0.99      0.38      0.55       253
+        Neutral       0.93      1.00      0.96      3351
+       Negative       0.95      0.65      0.77       308
+Critical/Urgent       0.00      0.00      0.00        10
+
+       accuracy                           0.93      3922
+      macro avg       0.72      0.51      0.57      3922
+   weighted avg       0.93      0.93      0.92      3922

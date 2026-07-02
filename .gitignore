@@ -1,0 +1,19 @@
+# Large binary model files (exceeds GitHub 100MB limit)
+output/dept_random_forest_model.pkl
+
+# Databases
+*.db
+grievance_system.db
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Local IDE and Jupyter configs
+.ipynb_checkpoints/
+.gemini/
+.idea/
+.vscode/
+
+# Log files
+*.log

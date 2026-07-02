@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis AI — Government Grievance & Sentiment Triage Platform</title>
+    <!-- Premium Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for beautiful analytical dashboards -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Top Premium Navigation Bar -->
+    <nav class="navbar" id="app-navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand" id="brand-link" onclick="switchTab('home')">
+                <div class="brand-logo"><i class="fa-solid fa-shield-halved"></i></div>
+                <span>AEGIS AI</span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="#" id="nav-home" class="active" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="#" id="nav-citizen" onclick="switchTab('citizen')"><i class="fa-solid fa-user"></i> Citizen Portal</a></li>
+                <li><a href="#" id="nav-officer" onclick="switchTab('officer')"><i class="fa-solid fa-building-user"></i> Officer Console</a></li>
+                <li><a href="#" id="nav-research" onclick="switchTab('research')"><i class="fa-solid fa-graduation-cap"></i> Research & Metrics</a></li>
+            </ul>
+
+            <div class="nav-auth-state" id="auth-status-container">
+                <span class="user-welcome" id="user-welcome-msg">Guest Access</span>
+                <button class="nav-logout-btn" id="logout-btn" onclick="handleLogout()" style="display: none;"><i class="fa-solid fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Container -->
+    <main class="app-container">
+
+        <!-- ==================== VIEW 1: HOME/LANDING PAGE ==================== -->
+        <section id="view-home" class="tab-content active">
+            <div class="hero-section">
+                <div class="hero-badge">Master's Capstone Project — AI & Data Science</div>
+                <h1 id="hero-title">AI-Driven Citizen Grievance & Sentiment Triage</h1>
+                <p class="hero-subtitle">
+                    A production-grade NLP architecture leveraging TF-IDF + Logistic Regression and fine-tuned DistilBERT models to automatically categorize, sentiment-analyze, and prioritize public grievances in real-time.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" onclick="switchTab('citizen')"><i class="fa-solid fa-file-signature"></i> File a Grievance</button>
+                    <button class="btn btn-secondary" onclick="switchTab('officer')"><i class="fa-solid fa-chart-line"></i> Officer Dashboard</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Snapshot Widgets -->
+            <div class="stats-overview-grid" id="public-stats-grid">
+                <div class="stat-card border-glow-blue">
+                    <div class="stat-icon bg-blue"><i class="fa-solid fa-folder-open"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Ingested Tickets</span>
+                        <h3 id="public-stat-total">--</h3>
+                    </div>
+                </div>
+                <div class="stat-card border-glow-yellow">
+                    <div class="stat-icon bg-yellow"><i class="fa-solid fa-clock"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Pending Backlog</span>
+                        <h3 id="public-stat-pending">--</h3>
+                    </div>
+                </div>
+                <div class="stat-card border-glow-green">
+                    <div class="stat-icon bg-green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Resolved Tickets</span>
+                        <h3 id="public-stat-resolved">--</h3>
+                    </div>
+                </div>
+                <div class="stat-card border-glow-red">
+                    <div class="stat-icon bg-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Average System Urgency</span>
+                        <h3 id="public-stat-urgency">--</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Public Sandbox Testing Panel -->
+            <div class="sandbox-container card-glass">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-flask"></i> Interactive Inference Sandbox</h2>
+                    <span class="badge badge-info">Public Access</span>
+                </div>
+                <p class="sandbox-desc">
+                    Test the underlying ML engine in real-time. Type any citizen complaint to see how the TF-IDF department router and sentiment analyzer compute urgency.
+                </p>
+
+                <div class="sandbox-grid">
+                    <div class="sandbox-input-panel">
+                        <label for="sandbox-text">Citizen Grievance Description:</label>
+                        <textarea id="sandbox-text" placeholder="Type complaint here (e.g. Broken water pipelines are flooding street sector 5...)"></textarea>
+                        
+                        <div class="presets-row">
+                            <button class="preset-pill" onclick="useSandboxPreset(1)">Burst Sewer</button>
+                            <button class="preset-pill" onclick="useSandboxPreset(2)">Blinking Light</button>
+                            <button class="preset-pill" onclick="useSandboxPreset(3)">Accident Pothole</button>
+                            <button class="preset-pill" onclick="useSandboxPreset(4)">Quick Road Fix</button>
+                        </div>
+
+                        <button class="btn btn-primary btn-full" id="sandbox-submit-btn" onclick="runSandboxInference()">
+                            <span id="sandbox-btn-text"><i class="fa-solid fa-brain"></i> Compute Predictions</span>
+                            <div class="spinner" id="sandbox-spinner" style="display: none;"></div>
+                        </button>
+                    </div>
+
+                    <div class="sandbox-output-panel" id="sandbox-output-placeholder">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            <p>Prediction outputs will appear here after submission</p>
+                        </div>
+                    </div>
+
+                    <div class="sandbox-output-panel" id="sandbox-output-results" style="display: none;">
+                        <div class="predictions-top">
+                            <div class="urgency-dial-container">
+                                <div class="circular-progress-big">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" class="bg"></circle>
+                                        <circle cx="50" cy="50" r="45" class="fg" id="sandbox-dial-fg"></circle>
+                                    </svg>
+                                    <div class="number">
+                                        <span class="val" id="sandbox-urgency-val">0.0</span>
+                                        <span class="lbl">Urgency</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sentiment-result-box">
+                                <span class="sentiment-badge-large" id="sandbox-sentiment-badge">Neutral</span>
+                                <div class="confidence-bar-container">
+                                    <div class="confidence-label">Confidence: <span id="sandbox-conf-val">0%</span></div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fg" id="sandbox-conf-bar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="routing-result-box">
+                            <label><i class="fa-solid fa-route"></i> Automated Department Route:</label>
+                            <div class="routing-details-card">
+                                <div class="routing-icon" id="sandbox-routing-icon"><i class="fa-solid fa-building"></i></div>
+                                <div class="routing-text">
+                                    <div class="routing-code" id="sandbox-dept-code">DEPT</div>
+                                    <div class="routing-name" id="sandbox-dept-name">Department Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="inference-footer">
+                            <span id="sandbox-model-used">Model: TF-IDF + Logistic Regression</span>
+                            <span id="sandbox-api-latency">Time: Just now</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== AUTH VIEW (LOGIN / REGISTER) ==================== -->
+        <section id="view-auth" class="tab-content">
+            <div class="auth-wrapper">
+                <div class="auth-card card-glass animate-fade-in">
+                    <div class="auth-tabs">
+                        <button class="auth-tab-btn active" id="auth-tab-login" onclick="toggleAuthForm('login')">Login</button>
+                        <button class="auth-tab-btn" id="auth-tab-register" onclick="toggleAuthForm('register')">Register</button>
+                    </div>
+
+                    <div class="auth-alert" id="auth-error-alert" style="display: none;"></div>
+                    <div class="auth-alert success" id="auth-success-alert" style="display: none;"></div>
+
+                    <!-- Login Form -->
+                    <form id="login-form" onsubmit="handleLoginSubmit(event)">
+                        <div class="form-group">
+                            <label for="login-username"><i class="fa-solid fa-user"></i> Username</label>
+                            <input type="text" id="login-username" placeholder="Enter username (e.g. officer, citizen)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                            <input type="password" id="login-password" placeholder="Enter password (e.g. admin123, citizen123)" required>
+                        </div>
+                        <div class="form-group auth-note">
+                            <p><strong>Demo Mode Enabled:</strong></p>
+                            <ul>
+                                <li>Officer: <code>officer</code> / <code>admin123</code></li>
+                                <li>Citizen: <code>citizen</code> / <code>citizen123</code></li>
+                            </ul>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full"><i class="fa-solid fa-sign-in-alt"></i> Access Dashboard</button>
+                    </form>
+
+                    <!-- Registration Form -->
+                    <form id="register-form" onsubmit="handleRegisterSubmit(event)" style="display: none;">
+                        <div class="form-group">
+                            <label for="reg-username"><i class="fa-solid fa-user-plus"></i> Chosen Username</label>
+                            <input type="text" id="reg-username" placeholder="Username (unique)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-fullname"><i class="fa-solid fa-id-card"></i> Full Name</label>
+                            <input type="text" id="reg-fullname" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password"><i class="fa-solid fa-lock"></i> Secure Password</label>
+                            <input type="password" id="reg-password" placeholder="Min 6 characters" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-role"><i class="fa-solid fa-user-tag"></i> Select Portal Access Role</label>
+                            <select id="reg-role" required>
+                                <option value="citizen">Citizen (File complaints, view personal queue)</option>
+                                <option value="officer">Government Officer (View analytics, triage complaints, resolve tickets)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-secondary btn-full"><i class="fa-solid fa-user-check"></i> Register Account</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 2: CITIZEN PORTAL ==================== -->
+        <section id="view-citizen" class="tab-content">
+            <!-- If citizen not logged in, we show prompt -->
+            <div class="auth-prompt-card card-glass" id="citizen-auth-prompt">
+                <div class="empty-state">
+                    <i class="fa-solid fa-lock"></i>
+                    <h2>Authentication Required</h2>
+                    <p>Log in with your Citizen account to file official grievances, receive AI routing tracking, and trace the progress of your tickets.</p>
+                    <button class="btn btn-primary" onclick="redirectToAuth('citizen')"><i class="fa-solid fa-sign-in-alt"></i> Login / Sign Up</button>
+                </div>
+            </div>
+
+            <!-- Citizen Workspace (Active when authenticated) -->
+            <div id="citizen-workspace" style="display: none;">
+                <div class="workspace-header">
+                    <h2><i class="fa-solid fa-circle-user"></i> Citizen Grievance Submission Desk</h2>
+                    <span class="user-pill" id="citizen-user-pill">John Doe (Citizen)</span>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Left: Submission Form -->
+                    <div class="card-glass p-6">
+                        <h2>File Official Grievance</h2>
+                        <label for="citizen-complaint-text">Describe your grievance or complaint in detail:</label>
+                        <textarea id="citizen-complaint-text" placeholder="Please describe what happened, including exact locations, affected services, and duration. For example: Main street sewers are blocked causing dirty sewage to spill onto roads since yesterday morning. It's a severe hazard..."></textarea>
+                        
+                        <label>Or use a pre-set test scenario:</label>
+                        <div class="presets-row margin-bottom">
+                            <button class="preset-pill" onclick="useCitizenPreset(1)">Sewer Overflow</button>
+                            <button class="preset-pill" onclick="useCitizenPreset(2)">Blinking Streetlight</button>
+                            <button class="preset-pill" onclick="useCitizenPreset(3)">Accident Pothole</button>
+                            <button class="preset-pill" onclick="useCitizenPreset(4)">Completed Work</button>
+                        </div>
+
+                        <button class="btn btn-primary btn-full" id="citizen-submit-btn" onclick="submitCitizenGrievance()">
+                            <span id="citizen-btn-text"><i class="fa-solid fa-paper-plane"></i> File Complaint with AI Triage</span>
+                            <div class="spinner" id="citizen-spinner" style="display: none;"></div>
+                        </button>
+                    </div>
+
+                    <!-- Right: AI Live Prediction Dashboard -->
+                    <div class="card-glass p-6">
+                        <h2>AI Routing & Urgency Score</h2>
+                        <div class="results-container">
+                            <div class="empty-state" id="citizen-predict-placeholder">
+                                <i class="fa-solid fa-bolt-lightning"></i>
+                                <p>Submit a complaint to see the automated AI classification details</p>
+                            </div>
+
+                            <div class="predictions-full" id="citizen-predict-results" style="display: none;">
+                                <div class="predictions-top">
+                                    <div class="urgency-dial-container">
+                                        <div class="circular-progress-big">
+                                            <svg viewBox="0 0 100 100">
+                                                <circle cx="50" cy="50" r="45" class="bg"></circle>
+                                                <circle cx="50" cy="50" r="45" class="fg" id="citizen-dial-fg"></circle>
+                                            </svg>
+                                            <div class="number">
+                                                <span class="val" id="citizen-urgency-val">0.0</span>
+                                                <span class="lbl">Urgency</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="sentiment-result-box">
+                                        <span class="sentiment-badge-large" id="citizen-sentiment-badge">Neutral</span>
+                                        <div class="confidence-bar-container">
+                                            <div class="confidence-label">Confidence: <span id="citizen-conf-val">0%</span></div>
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fg" id="citizen-conf-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="routing-result-box">
+                                    <label><i class="fa-solid fa-route"></i> Assigned Department Route:</label>
+                                    <div class="routing-details-card">
+                                        <div class="routing-icon" id="citizen-routing-icon"><i class="fa-solid fa-building"></i></div>
+                                        <div class="routing-text">
+                                            <div class="routing-code" id="citizen-dept-code">DEPT</div>
+                                            <div class="routing-name" id="citizen-dept-name">Department Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="inference-footer">
+                                    <span id="citizen-model-used">Model: TF-IDF + Logistic Regression</span>
+                                    <span>Triage Latency: <strong style="color: var(--color-green);">~4ms</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citizen's Personal Queue -->
+                <div class="personal-queue-section card-glass margin-top">
+                    <div class="queue-header">
+                        <h2><i class="fa-solid fa-list-check"></i> My Submitted Grievance History</h2>
+                        <span class="queue-stats-mini">Total Filed: <strong id="citizen-total-count">0</strong></span>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">ID</th>
+                                    <th style="width: 45%;">Complaint Text</th>
+                                    <th style="width: 20%;">Assigned Department</th>
+                                    <th style="width: 10%;">Urgency Score</th>
+                                    <th style="width: 10%;">Status</th>
+                                    <th style="width: 10%;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="citizen-queue-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">No complaints filed yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 3: OFFICER CONSOLE ==================== -->
+        <section id="view-officer" class="tab-content">
+            <!-- If officer not logged in, we show prompt -->
+            <div class="auth-prompt-card card-glass" id="officer-auth-prompt">
+                <div class="empty-state">
+                    <i class="fa-solid fa-lock"></i>
+                    <h2>Government Portal Authentication Required</h2>
+                    <p>Accessing government dashboard, live workload distribution graphs, and triage queues requires an authorized Officer login.</p>
+                    <button class="btn btn-primary" onclick="redirectToAuth('officer')"><i class="fa-solid fa-sign-in-alt"></i> Officer Login</button>
+                </div>
+            </div>
+
+            <!-- Officer Console (Active when authenticated) -->
+            <div id="officer-workspace" style="display: none;">
+                <div class="workspace-header">
+                    <h2><i class="fa-solid fa-chalkboard-user"></i> Civic Grievance Triage Console</h2>
+                    <span class="user-pill" id="officer-user-pill">Officer (Admin)</span>
+                </div>
+
+                <!-- Metrics Widgets -->
+                <div class="stats-overview-grid margin-bottom">
+                    <div class="stat-card border-glow-blue">
+                        <div class="stat-icon bg-blue"><i class="fa-solid fa-folder-open"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Ingested</span>
+                            <h3 id="officer-stat-total">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card border-glow-yellow">
+                        <div class="stat-icon bg-yellow"><i class="fa-solid fa-clock"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Pending Triage</span>
+                            <h3 id="officer-stat-pending">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card border-glow-green">
+                        <div class="stat-icon bg-green"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Resolved Tickets</span>
+                            <h3 id="officer-stat-resolved">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card border-glow-red">
+                        <div class="stat-icon bg-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Avg System Urgency</span>
+                            <h3 id="officer-stat-urgency">0.0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytical Charts -->
+                <div class="charts-grid margin-bottom">
+                    <div class="chart-card card-glass">
+                        <h3><i class="fa-solid fa-chart-bar"></i> Departmental Workload Distribution</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-departments"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card card-glass">
+                        <h3><i class="fa-solid fa-chart-pie"></i> Public Sentiment Distribution</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-sentiments"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Master Grievance Queue -->
+                <div class="master-queue-section card-glass">
+                    <div class="queue-header-complex">
+                        <div class="header-left">
+                            <h2><i class="fa-solid fa-folder-tree"></i> Official Civic Triage Queue</h2>
+                            <p>Sorted by Urgency Priority Index (UPI) automatically computed by the system models</p>
+                        </div>
+                        <div class="filter-bar">
+                            <div class="filter-group">
+                                <label for="filter-dept">Dept:</label>
+                                <select id="filter-dept" onchange="fetchOfficerQueue()">
+                                    <option value="">All Departments</option>
+                                    <option value="MINWR">MINWR (Water Resources)</option>
+                                    <option value="DOURD">DOURD (Urban Roads)</option>
+                                    <option value="DOSAT">DOSAT (Sanitation)</option>
+                                    <option value="MPOWR">MPOWR (Power/Electricity)</option>
+                                    <option value="UIDAI">UIDAI (Identifications)</option>
+                                    <option value="DHLTH">DHLTH (Health Services)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-status">Status:</label>
+                                <select id="filter-status" onchange="fetchOfficerQueue()">
+                                    <option value="">All Statuses</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Resolved">Resolved</option>
+                                </select>
+                            </div>
+                            <div class="filter-group-search">
+                                <input type="text" id="filter-search" placeholder="Search grievance text..." oninput="fetchOfficerQueue()">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">Rank</th>
+                                    <th style="width: 8%;">Submitter</th>
+                                    <th style="width: 42%;">Complaint Description</th>
+                                    <th style="width: 17%;">Assigned Department</th>
+                                    <th style="width: 8%;">Urgency</th>
+                                    <th style="width: 10%;">Status</th>
+                                    <th style="width: 10%;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="officer-queue-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading official triage queue...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 4: RESEARCH & METRICS ==================== -->
+        <section id="view-research" class="tab-content">
+            <div class="research-header">
+                <h2><i class="fa-solid fa-graduation-cap"></i> Academic Research & Model Evaluation Workspace</h2>
+                <p>Final Year Project Technical Evaluation Report — Natural Language Processing & Grievance Routing Systems</p>
+            </div>
+
+            <!-- Pipeline architecture diagram & summaries -->
+            <div class="research-architecture card-glass margin-bottom">
+                <h3>System Architecture & Processing Pipeline</h3>
+                <div class="pipeline-flow">
+                    <div class="pipeline-step">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Text Preprocessing</div>
+                        <p class="step-desc">Tokenization, Lemmatization, Stop-word removal (NLTK & VADER analysis)</p>
+                    </div>
+                    <div class="pipeline-connector"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="pipeline-step">
+                        <div class="step-num">2</div>
+                        <div class="step-title">Feature Extraction</div>
+                        <p class="step-desc">TF-IDF Vectorization for department and sentiment traditional classification pipelines</p>
+                    </div>
+                    <div class="pipeline-connector"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="pipeline-step">
+                        <div class="step-num">3</div>
+                        <div class="step-title">Model Inference</div>
+                        <p class="step-desc">Dual Logistic Regression pipelines output predictions & class probabilities</p>
+                    </div>
+                    <div class="pipeline-connector"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="pipeline-step">
+                        <div class="step-num">4</div>
+                        <div class="step-title">Triage Routing</div>
+                        <p class="step-desc">Urgency heuristics combine sentiment confidence, text length & urgency scores</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ML Evaluation Visuals Gallery -->
+            <div class="research-grid">
+                <!-- Evaluation Reports -->
+                <div class="card-glass p-6">
+                    <h3>Model Performance Metrics</h3>
+                    
+                    <div class="metrics-accordion">
+                        <div class="metrics-accordion-header active" onclick="toggleAccordion('sentiment-acc')">
+                            <span><i class="fa-solid fa-face-meh-blank"></i> Sentiment Analysis Performance</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="metrics-accordion-content active" id="sentiment-acc">
+                            <div class="report-stats">
+                                <div class="mini-stat-item">
+                                    <span class="label">Overall Accuracy</span>
+                                    <span class="val">92.94%</span>
+                                </div>
+                                <div class="mini-stat-item">
+                                    <span class="label">Macro F1-Score</span>
+                                    <span class="val">57.06%</span>
+                                </div>
+                                <div class="mini-stat-item">
+                                    <span class="label">Weighted F1-Score</span>
+                                    <span class="val">91.76%</span>
+                                </div>
+                            </div>
+                            <pre class="terminal-report" id="sentiment-report-text">Loading report...</pre>
+                        </div>
+
+                        <div class="metrics-accordion-header margin-top" onclick="toggleAccordion('department-acc')">
+                            <span><i class="fa-solid fa-network-wired"></i> Department Router Performance</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="metrics-accordion-content" id="department-acc">
+                            <div class="report-stats">
+                                <div class="mini-stat-item">
+                                    <span class="label">Accuracy</span>
+                                    <span class="val">69.25%</span>
+                                </div>
+                                <div class="mini-stat-item">
+                                    <span class="label">Macro F1-Score</span>
+                                    <span class="val">45.52%</span>
+                                </div>
+                                <div class="mini-stat-item">
+                                    <span class="label">Weighted F1-Score</span>
+                                    <span class="val">68.00%</span>
+                                </div>
+                            </div>
+                            <pre class="terminal-report" id="dept-report-text">Loading report...</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Training & Validation Charts from output directory -->
+                <div class="card-glass p-6">
+                    <h3>Training & Validation Curves</h3>
+                    
+                    <div class="image-gallery-container">
+                        <!-- Navigation tabs for the image gallery -->
+                        <div class="gallery-tabs">
+                            <button class="gallery-tab-btn active" onclick="switchGalleryImage('/output/week4_performance_dashboard.png', this)">Performance Dashboard</button>
+                            <button class="gallery-tab-btn" onclick="switchGalleryImage('/output/week4_sentiment_confusion_matrix.png', this)">Sentiment Matrix</button>
+                            <button class="gallery-tab-btn" onclick="switchGalleryImage('/output/week4_dept_confusion_matrix.png', this)">Department Matrix</button>
+                            <button class="gallery-tab-btn" onclick="switchGalleryImage('/output/week4_f1_score_comparison.png', this)">F1 Comparison</button>
+                        </div>
+                        <div class="gallery-image-wrapper">
+                            <img src="/output/week4_performance_dashboard.png" id="gallery-target-image" alt="Training Validation Graphic" onerror="handleImageLoadError(this)">
+                        </div>
+                        <p class="gallery-image-caption" id="gallery-target-caption">Figure 1: Week 4 ML validation performance summary showing model validation metrics, F1-scores, and inference speed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== DIALOGS & MODALS ==================== -->
+    
+    <!-- Grievance Action Modal (Update status / Resolution Comment) -->
+    <div class="modal" id="ticket-modal">
+        <div class="modal-dialog card-glass animate-zoom-in">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-edit"></i> Manage Grievance Triage Ticket</h3>
+                <button class="modal-close" onclick="closeTicketModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-detail-row">
+                    <span class="lbl">Submitter:</span>
+                    <span class="val" id="modal-submitter">--</span>
+                </div>
+                <div class="ticket-detail-row">
+                    <span class="lbl">Filed At:</span>
+                    <span class="val" id="modal-date">--</span>
+                </div>
+                <div class="ticket-detail-row">
+                    <span class="lbl">Predicted Dept:</span>
+                    <span class="val" id="modal-dept">--</span>
+                </div>
+                <div class="ticket-detail-row">
+                    <span class="lbl">Priority Score:</span>
+                    <span class="val text-red" id="modal-urgency">0.00</span>
+                </div>
+                <div class="ticket-detail-row">
+                    <span class="lbl">Sentiment:</span>
+                    <span class="val" id="modal-sentiment">Neutral</span>
+                </div>
+                <div class="ticket-desc-box">
+                    <label>Original Complaint Text:</label>
+                    <p id="modal-text">--</p>
+                </div>
+                
+                <hr class="modal-hr">
+
+                <form id="modal-status-form" onsubmit="handleStatusSubmit(event)">
+                    <input type="hidden" id="modal-ticket-id">
+                    
+                    <div class="form-group">
+                        <label for="modal-status"><i class="fa-solid fa-rotate"></i> Update Resolution Status</label>
+                        <select id="modal-status" required>
+                            <option value="Pending">Pending (Awaiting action)</option>
+                            <option value="In Progress">In Progress (Assigned / Investigating)</option>
+                            <option value="Resolved">Resolved (Completed / Solved)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modal-comments"><i class="fa-solid fa-comment-medical"></i> Official Officer Resolution Remarks</label>
+                        <textarea id="modal-comments" placeholder="Describe actions taken to address the complaint..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full"><i class="fa-solid fa-save"></i> Save Changes & Disconnect</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grievance Detail Modal (For Citizen View, read-only remarks) -->
+    <div class="modal" id="citizen-detail-modal">
+        <div class="modal-dialog card-glass animate-zoom-in">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-circle-info"></i> Grievance Status Details</h3>
+                <button class="modal-close" onclick="closeCitizenDetailModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-detail-row">
+                    <span class="lbl">Ticket Status:</span>
+                    <span class="val" id="cit-modal-status-badge">--</span>
+                </div>
+                <div class="ticket-detail-row">
+                    <span class="lbl">Routed Department:</span>
+                    <span class="val" id="cit-modal-dept">--</span>
+                </div>
+                <div class="ticket-detail-row">
+                    <span class="lbl">Urgency Priority Index:</span>
+                    <span class="val text-yellow" id="cit-modal-urgency">0.00</span>
+                </div>
+                <div class="ticket-detail-row">
+                    <span class="lbl">Submission Time:</span>
+                    <span class="val" id="cit-modal-date">--</span>
+                </div>
+                <div class="ticket-desc-box">
+                    <label>Your Complaint Description:</label>
+                    <p id="cit-modal-text">--</p>
+                </div>
+                <div class="ticket-desc-box border-glow-green" id="cit-modal-comments-container">
+                    <label style="color: var(--color-green);"><i class="fa-solid fa-comment-dots"></i> Government Officer Resolution Remarks:</label>
+                    <p id="cit-modal-comments" style="font-style: italic;">No actions taken yet.</p>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 0.5rem;" id="cit-modal-resolved-time"></div>
+                </div>
+                <button class="btn btn-secondary btn-full margin-top" onclick="closeCitizenDetailModal()">Close Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script loading -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

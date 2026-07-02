@@ -1,0 +1,6 @@
+complaint_text,predicted_department,predicted_sentiment,urgency_score,sentiment_confidence,model_used,timestamp
+The water pipes in my area have burst and there's raw sewage on the streets. This is a serious health hazard affecting the entire neighborhood!,MOEAF,Neutral,4.4,0.5962,TF-IDF + Logistic Regression,2026-06-19T16:54:36.642571
+The road near my house has some potholes that need fixing. Could you please send a repair team?,DOURD,Neutral,4.92,0.8849,TF-IDF + Logistic Regression,2026-06-19T16:54:36.670508
+Thank you for the excellent road maintenance work in our locality. The streets are much cleaner now.,DOURD,Neutral,4.62,0.7383,TF-IDF + Logistic Regression,2026-06-19T16:54:36.689004
+Just noting that streetlights in the park area are working fine.,DOURD,Neutral,4.71,0.8057,TF-IDF + Logistic Regression,2026-06-19T16:54:36.711209
+"URGENT: Power outage for 3 days! Hospital backup power failing, critical situation, people dying!",MPOWR,Neutral,4.82,0.8507,TF-IDF + Logistic Regression,2026-06-19T16:54:36.728086

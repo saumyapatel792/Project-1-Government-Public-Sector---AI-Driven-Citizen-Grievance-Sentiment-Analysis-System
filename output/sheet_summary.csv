@@ -1,0 +1,6 @@
+sheet_name,rows,cols,columns
+Complaint Category,19853,6,"Code, Description, OrgCode, Parent, Stage, MonitoringCode"
+Input Fields,2897,13,"Id, Code, FieldName, DisplayLable, FieldType, FieldOrder, IsMandatory, DataType, MinDataLength, MaxDataLength, IsVisible, IsSearchable, IsActive"
+ComplaintCategory-InputFieldMap,6535,2,"CategoryCode, FieldCode"
+Movement Mapping,10355,9,"id, categoryCodeFrom, categoryCodeTo, fromOrg, toOrg, orgLevel, canClose, isActive, dependentOn"
+Fixed Destination,10251,4,"Id, OrgCode, FinalCategory, Destination"

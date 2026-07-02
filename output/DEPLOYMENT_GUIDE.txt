@@ -1,0 +1,110 @@
+
+📚 DEPLOYMENT INSTRUCTIONS:
+
+1. SAVE FASTAPI APPLICATION:
+   The FastAPI application defined above is ready for deployment.
+
+2. CREATE MAIN APPLICATION FILE (main_api.py):
+   Save the app code to a production file and run:
+
+   $ uvicorn main_api:app --host 0.0.0.0 --port 8000 --reload
+
+   For production (no auto-reload):
+   $ uvicorn main_api:app --host 0.0.0.0 --port 8000 --workers 4
+
+3. DOCKER DEPLOYMENT (Recommended for Production):
+   Create a Dockerfile with:
+   ```
+   FROM python:3.9-slim
+   WORKDIR /app
+   COPY requirements.txt .
+   RUN pip install -r requirements.txt
+   COPY . .
+   CMD ["uvicorn", "main_api:app", "--host", "0.0.0.0", "--port", "8000"]
+   ```
+
+   Build and run:
+   $ docker build -t grievance-api .
+   $ docker run -p 8000:8000 grievance-api
+
+4. API ENDPOINTS:
+
+   📍 Health Check:
+      GET /health
+      Returns: Model loading status
+
+   📍 Root Endpoint:
+      GET /
+      Returns: API status and available endpoints
+
+   📍 Predict (TF-IDF Model - Fast):
+      POST /predict
+      Request: {"complaint_text": "your complaint here"}
+      Response: {
+          "predicted_department": "string",
+          "predicted_sentiment": "Positive|Neutral|Negative|Critical/Urgent",
+          "urgency_score": 0.0-10.0,
+          "sentiment_confidence": 0.0-1.0,
+          "model_used": "TF-IDF + Logistic Regression",
+          "timestamp": "ISO 8601 timestamp"
+      }
+
+   📍 Predict with DistilBERT (More Accurate - Slower):
+      POST /predict-bert
+      Request: {"complaint_text": "your complaint here"}
+      Response: Same as /predict but with DistilBERT model
+
+5. INTERACTIVE API DOCUMENTATION:
+   Once running, visit:
+   http://localhost:8000/docs        (Swagger UI)
+   http://localhost:8000/redoc       (ReDoc)
+
+6. EXAMPLE CURL REQUESTS:
+
+   Health Check:
+   $ curl http://localhost:8000/health
+
+   Predict Department & Sentiment:
+   $ curl -X POST http://localhost:8000/predict \
+     -H "Content-Type: application/json" \
+     -d '{"complaint_text": "The water pipes are broken!"}'
+
+   Using DistilBERT:
+   $ curl -X POST http://localhost:8000/predict-bert \
+     -H "Content-Type: application/json" \
+     -d '{"complaint_text": "URGENT: No power for 3 days!"}'
+
+7. PYTHON CLIENT EXAMPLE:
+
+   import requests
+
+   url = "http://localhost:8000/predict"
+   complaint = {"complaint_text": "Water supply is contaminated"}
+   response = requests.post(url, json=complaint)
+   result = response.json()
+
+   print(f"Department: {result['predicted_department']}")
+   print(f"Sentiment: {result['predicted_sentiment']}")
+   print(f"Urgency: {result['urgency_score']}/10")
+
+8. PERFORMANCE METRICS:
+   - Model: TF-IDF + Logistic Regression
+   - Department Accuracy: 69.25%
+   - Sentiment Accuracy: 92.94%
+   - Sentiment Macro F1-Score: 0.5706 (Optimized for minority classes)
+   - Avg Response Time: ~50ms per request
+   - Max Concurrent Requests: Limited by hardware
+
+9. MONITORING & LOGGING:
+   - All predictions logged with timestamp
+   - Failed requests tracked in error logs
+   - Model performance metrics saved to CSV
+   - API response times monitored
+
+10. SCALING RECOMMENDATIONS:
+    - Use Docker + Kubernetes for production
+    - Load balance with Nginx/HAProxy
+    - Cache frequent queries
+    - Monitor GPU usage for DistilBERT
+    - Set up rate limiting (RateLimiter in FastAPI)
+    - Use queuing (Celery) for heavy workloads

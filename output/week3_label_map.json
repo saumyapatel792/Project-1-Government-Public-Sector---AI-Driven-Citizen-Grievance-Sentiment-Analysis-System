@@ -1,0 +1,14 @@
+{
+  "label_map": {
+    "Positive": 0,
+    "Neutral": 1,
+    "Negative": 2,
+    "Critical/Urgent": 3
+  },
+  "id2label": {
+    "0": "Positive",
+    "1": "Neutral",
+    "2": "Negative",
+    "3": "Critical/Urgent"
+  }
+}
