@@ -1,4 +1,4 @@
-# Aegis AI — Government Grievance & Sentiment Triage Platform
+ # Aegis AI — Government Grievance & Sentiment Triage Platform
 
 [![Python 3.8+](https://img.shields.co/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.co/badge/Framework-FastAPI-green.svg)](https://fastapi.tiangolo.com/)
@@ -62,9 +62,9 @@ graph TD
 ---
 
 ## Tech Stack & Requirements
-*   **Backend:** Python 3.8+, FastAPI, Uvicorn, SQLite
-*   **Machine Learning:** Scikit-learn, joblib, NumPy, Pandas, NLTK
-*   **Frontend:** Vanilla CSS, HTML5, JavaScript (SPA architecture), Chart.js CDN, FontAwesome CDN
+*   **Backend:** Python 3.8+, FastAPI, SQLite
+*   **Machine Learning:** Scikit-learn, joblib, NumPy, Pandas
+*   **Frontend:** Vanilla CSS, HTML5, JavaScript (SPA architecture), Chart.js CDN
 *   **Dependencies:** Listed in `output/requirements.txt`
 
 ---
